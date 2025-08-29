@@ -12,7 +12,9 @@ func main() {
 	file_info, err := os.Stat(file_name)
 	if err != nil {
 		fmt.Println("Error:", err)
+		return
 	}
 
 	fmt.Printf("file size (%s): %d bytes\n", file_name, file_info.Size())
+
 }
