@@ -6,38 +6,6 @@ import (
 	"path/filepath"
 )
 
-// 递归计算文件夹大小，返回字节数
-func calc_folder_size(folder_path string) int64 {
-	total_size := int64(0)
-
-	filepath.Walk(folder_path, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			total_size = -1
-			return err
-		}
-
-		if path == folder_path {
-			return err
-		}
-
-		if !info.IsDir() {
-			total_size += info.Size()
-		} else {
-			size := calc_folder_size(path)
-			if size == -1 {
-				total_size = -1
-				return fmt.Errorf("error when calc folder size")
-			} else {
-				total_size += size
-			}
-		}
-
-		return err
-	})
-
-	return total_size
-}
-
 var help_info string = `输入文件名或文件夹名称来计算文件或文件夹大小: 
 	calc_size [Your file name or folder name]
 
@@ -72,8 +40,18 @@ func main() {
 			continue
 		}
 
-		file_sizes[i] = calc_folder_size(file_path)
+		filepath.Walk(file_path, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				file_sizes[i] = -1
+				return err
+			}
 
+			if !info.IsDir() {
+				file_sizes[i] += info.Size()
+			}
+
+			return err
+		})
 	}
 
 	for i, file_path := range file_paths {
