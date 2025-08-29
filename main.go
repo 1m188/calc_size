@@ -77,7 +77,25 @@ func main() {
 	}
 
 	for i, file_path := range file_paths {
-		fmt.Printf("%s: %d bytes\n", file_path, file_sizes[i])
+		size := float64(file_sizes[i])
+		unit := "B"
+
+		if size > 1024 {
+			size /= 1024
+			unit = "KB"
+
+			if size > 1024 {
+				size /= 1024
+				unit = "MB"
+
+				if size > 1024 {
+					size /= 1024
+					unit = "GB"
+				}
+			}
+		}
+
+		fmt.Printf("%s: %f %s\n", file_path, size, unit)
 	}
 
 }
