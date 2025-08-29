@@ -1,7 +1,18 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 func main() {
-	fmt.Println("Hello, World!")
+
+	file_name := "go.mod"
+
+	file_info, err := os.Stat(file_name)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+
+	fmt.Printf("file size (%s): %d bytes\n", file_name, file_info.Size())
 }
