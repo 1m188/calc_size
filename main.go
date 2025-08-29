@@ -73,7 +73,7 @@ func main() {
 			}
 		}
 
-		fmt.Printf("%s: %f %s\n", file_path, size, unit)
+		fmt.Printf("%s: %.2f %s\n", file_path, size, unit)
 	}
 
 }
