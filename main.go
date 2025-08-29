@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 )
 
+// 递归计算文件夹大小，返回字节数
 func calc_folder_size(folder_path string) int64 {
 	total_size := int64(0)
 
