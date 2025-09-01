@@ -37,7 +37,7 @@ func print_size(file_paths []string, file_sizes []int64) {
 	// 转换文件大小单位
 	for i := range file_paths {
 		size := float64(file_sizes[i])
-		unit := "B"
+		unit := " B"
 
 		if size > 1024 {
 			size /= 1024
@@ -52,6 +52,10 @@ func print_size(file_paths []string, file_sizes []int64) {
 					unit = "GB"
 				}
 			}
+		}
+
+		if size < 0 {
+			unit = "  "
 		}
 
 		file_sizes_str[i] = fmt.Sprintf("%.2f", size) + " " + unit
