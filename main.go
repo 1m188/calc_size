@@ -14,6 +14,31 @@ var help_info string = `输入文件名或文件夹名称来计算文件或文�
 
 输出-1则表示该文件不存在或文件夹存在路径错误或者其他错误`
 
+// 输出文件大小
+func print_size(file_paths []string, file_sizes []int64) {
+	for i, file_path := range file_paths {
+		size := float64(file_sizes[i])
+		unit := "B"
+
+		if size > 1024 {
+			size /= 1024
+			unit = "KB"
+
+			if size > 1024 {
+				size /= 1024
+				unit = "MB"
+
+				if size > 1024 {
+					size /= 1024
+					unit = "GB"
+				}
+			}
+		}
+
+		fmt.Printf("%s: %.2f %s\n", file_path, size, unit)
+	}
+}
+
 func main() {
 
 	args := os.Args
@@ -54,26 +79,6 @@ func main() {
 		})
 	}
 
-	for i, file_path := range file_paths {
-		size := float64(file_sizes[i])
-		unit := "B"
-
-		if size > 1024 {
-			size /= 1024
-			unit = "KB"
-
-			if size > 1024 {
-				size /= 1024
-				unit = "MB"
-
-				if size > 1024 {
-					size /= 1024
-					unit = "GB"
-				}
-			}
-		}
-
-		fmt.Printf("%s: %.2f %s\n", file_path, size, unit)
-	}
+	print_size(file_paths, file_sizes)
 
 }
