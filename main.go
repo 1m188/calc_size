@@ -50,7 +50,7 @@ func print_size(file_paths []string, file_sizes []int64) {
 			unit = "  "
 		}
 
-		file_sizes_str[i] = fmt.Sprintf("%.2f", size) + " " + unit
+		file_sizes_str[i] = fmt.Sprintf("%.2f %s", size, unit)
 	}
 
 	// 补全所有文件大小长度到最长文件大小长度
