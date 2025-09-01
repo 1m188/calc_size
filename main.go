@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 var help_info string = `输入文件名或文件夹名称来计算文件或文件夹大小: 
@@ -16,7 +17,25 @@ var help_info string = `输入文件名或文件夹名称来计算文件或文�
 
 // 输出文件大小
 func print_size(file_paths []string, file_sizes []int64) {
+
+	// 补全所有文件路径长度到最长文件路径长度
+	leftLen := 0
+	for _, file_path := range file_paths {
+		if len(file_path) > leftLen {
+			leftLen = len(file_path)
+		}
+	}
 	for i, file_path := range file_paths {
+		if len(file_path) < leftLen {
+			file_path += strings.Repeat(" ", leftLen-len(file_path))
+			file_paths[i] = file_path
+		}
+	}
+
+	file_sizes_str := make([]string, len(file_sizes))
+
+	// 转换文件大小单位
+	for i := range file_paths {
 		size := float64(file_sizes[i])
 		unit := "B"
 
@@ -35,7 +54,26 @@ func print_size(file_paths []string, file_sizes []int64) {
 			}
 		}
 
-		fmt.Printf("%s: %.2f %s\n", file_path, size, unit)
+		file_sizes_str[i] = fmt.Sprintf("%.2f", size) + " " + unit
+	}
+
+	// 补全所有文件大小长度到最长文件大小长度
+	rightLen := 0
+	for _, file_size_str := range file_sizes_str {
+		if len(file_size_str) > rightLen {
+			rightLen = len(file_size_str)
+		}
+	}
+	for i, file_size_str := range file_sizes_str {
+		if len(file_size_str) < rightLen {
+			file_size_str = strings.Repeat(" ", rightLen-len(file_size_str)) + file_size_str
+			file_sizes_str[i] = file_size_str
+		}
+	}
+
+	// 输出文件路径和文件大小
+	for i := range file_paths {
+		fmt.Printf("%s  :  %s\n", file_paths[i], file_sizes_str[i])
 	}
 }
 
