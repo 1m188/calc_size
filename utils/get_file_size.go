@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 )
 
 // 获取文件/文件夹大小，单位为字节
-func getFileSize(file_paths []string) []int64 {
+func GetFileSize(file_paths []string) []int64 {
 	file_sizes := make([]int64, len(file_paths)) // 计算出来的文件大小
 	var wg sync.WaitGroup                        // 等待所有goroutine完成
 
