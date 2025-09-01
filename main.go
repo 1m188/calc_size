@@ -6,17 +6,8 @@ import (
 	"path/filepath"
 )
 
-func main() {
-
-	args := os.Args
-
-	// 输出帮助信息
-	if len(args) == 2 && (args[1] == "--help" || args[1] == "--h" || args[1] == "-help" || args[1] == "-h") {
-		fmt.Println(help_info)
-		return
-	}
-
-	file_paths := args[1:]                       // 文件路径
+// 获取文件/文件夹大小，单位为字节
+func getFileSize(file_paths []string) []int64 {
 	file_sizes := make([]int64, len(file_paths)) // 计算出来的文件大小
 
 	for i, file_path := range file_paths {
@@ -46,6 +37,23 @@ func main() {
 		})
 	}
 
-	print_size(file_paths, file_sizes)
+	return file_sizes
+}
+
+func main() {
+
+	args := os.Args
+
+	// 输出帮助信息
+	if len(args) == 2 && (args[1] == "--help" || args[1] == "--h" || args[1] == "-help" || args[1] == "-h") {
+		fmt.Println(help_info)
+		return
+	}
+
+	file_paths := args[1:] // 文件路径
+
+	file_sizes := getFileSize(file_paths) // 文件大小
+
+	print_size(file_paths, file_sizes) // 打印文件大小
 
 }
