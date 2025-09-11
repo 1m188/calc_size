@@ -2,11 +2,12 @@ package utils
 
 import (
 	"fmt"
+	"math/big"
 	"strings"
 )
 
 // 输出文件大小
-func PrintSize(file_paths []string, file_sizes []int64) {
+func PrintSize(file_paths []string, file_sizes []string) {
 
 	// 补全所有文件路径长度到最长文件路径长度
 	leftLen := 0
@@ -22,29 +23,30 @@ func PrintSize(file_paths []string, file_sizes []int64) {
 		}
 	}
 
-	file_sizes_str := make([]string, len(file_sizes))
-
 	// 转换文件大小单位
+	file_sizes_str := make([]string, len(file_sizes)) // 转换后的文件大小
+	prec := uint(512)                                 // 精度
 	for i := range file_paths {
-		size := float64(file_sizes[i])
+		size, _ := big.NewFloat(0).SetPrec(prec).SetString(file_sizes[i])
+		two := big.NewFloat(1024).SetPrec(prec)
 		unit := " B"
 
-		if size > 1024 {
-			size /= 1024
+		if size.Cmp(two) > 0 {
+			size.Quo(size, two)
 			unit = "KB"
 
-			if size > 1024 {
-				size /= 1024
+			if size.Cmp(two) > 0 {
+				size.Quo(size, two)
 				unit = "MB"
 
-				if size > 1024 {
-					size /= 1024
+				if size.Cmp(two) > 0 {
+					size.Quo(size, two)
 					unit = "GB"
 				}
 			}
 		}
 
-		if size < 0 {
+		if size.Cmp(big.NewFloat(0).SetPrec(prec)) < 0 {
 			unit = "  "
 		}
 
