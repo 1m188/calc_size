@@ -1,14 +1,27 @@
-use std::{env, fs, path::Path};
+use astro_float::{BigFloat, Consts, RoundingMode, ctx::Context};
+use std::{env, fs, path::Path, sync::LazyLock};
 
-fn calc_size(path: &Path) -> std::io::Result<u64> {
+// 大数上下文
+static CTX: LazyLock<Context> = LazyLock::new(|| {
+    Context::new(
+        512,                    // 精度
+        RoundingMode::ToEven,   // 舍入
+        Consts::new().unwrap(), // 常数缓存
+        -100_000,               // 指数下界
+        100_000,                // 指数上界
+    )
+});
+
+// 计算文件/文件夹大小
+fn calc_size(path: &Path) -> std::io::Result<BigFloat> {
     let metadata = fs::metadata(path)?;
 
     if metadata.is_file() {
         // 如果是文件，直接返回其大小
-        Ok(metadata.len())
+        Ok(BigFloat::from_u64(metadata.len(), CTX.precision()))
     } else if metadata.is_dir() {
         // 如果是目录，递归计算所有内容的大小
-        let mut total_size = 0u64;
+        let mut total_size = BigFloat::from_u64(0, CTX.precision());
 
         // 遍历目录中的所有条目
         for entry in fs::read_dir(path)? {
@@ -16,13 +29,14 @@ fn calc_size(path: &Path) -> std::io::Result<u64> {
             let entry_path = entry.path();
 
             // 递归计算每个条目的大小并累加
-            total_size += calc_size(&entry_path)?;
+            let x = calc_size(&entry_path)?;
+            total_size = total_size.add(&x, CTX.precision(), CTX.rounding_mode());
         }
 
         Ok(total_size)
     } else {
         // 既不是文件也不是目录（如符号链接等）
-        Ok(0)
+        Ok(BigFloat::from_u64(0, CTX.precision()))
     }
 }
 
@@ -49,7 +63,8 @@ fn main() {
     }
 
     // 文件大小
-    let mut file_sizes: Vec<f64> = vec![-1.; file_paths.len()];
+    let mut file_sizes: Vec<BigFloat> =
+        vec![BigFloat::from_f64(-1., CTX.precision()); file_paths.len()];
 
     // 大小单位
     let mut units: Vec<String> = vec![String::from(" B"); file_sizes.len()];
@@ -58,8 +73,8 @@ fn main() {
     for (i, file_path) in file_paths.iter().enumerate() {
         let path = Path::new(file_path);
         file_sizes[i] = match calc_size(path) {
-            Ok(size) => size as f64,
-            Err(_) => -1.,
+            Ok(size) => size,
+            Err(_) => BigFloat::from_f64(-1., CTX.precision()),
         }
     }
 
@@ -81,34 +96,35 @@ fn main() {
 
     // 单位转换
     for i in 0..file_sizes.len() {
-        if file_sizes[i] >= 1024. {
-            file_sizes[i] /= 1024.;
+        let two = BigFloat::from_f64(1024., CTX.precision());
+        if file_sizes[i] >= two {
+            file_sizes[i] = file_sizes[i].div(&two, CTX.precision(), CTX.rounding_mode());
             units[i] = String::from("KB");
 
-            if file_sizes[i] >= 1024. {
-                file_sizes[i] /= 1024.;
+            if file_sizes[i] >= two {
+                file_sizes[i] = file_sizes[i].div(&two, CTX.precision(), CTX.rounding_mode());
                 units[i] = String::from("MB");
 
-                if file_sizes[i] >= 1024. {
-                    file_sizes[i] /= 1024.;
+                if file_sizes[i] >= two {
+                    file_sizes[i] = file_sizes[i].div(&two, CTX.precision(), CTX.rounding_mode());
                     units[i] = String::from("GB");
                 }
             }
         }
 
-        if file_sizes[i] < 0. {
+        if file_sizes[i] < BigFloat::from_f64(0., CTX.precision()) {
             units[i] = String::from("  ");
         }
     }
 
     // 输出最终结果
     for (i, file_path) in file_paths.iter().enumerate() {
-        println!(
-            "{} : {:>w$.2} {}",
-            file_path,
-            file_sizes[i],
-            units[i],
-            w = 8, // 根据需要调整宽度
-        );
+        // 手动转换file_size
+        let s = file_sizes[i].to_string();
+        let li: Vec<&str> = s.split('e').collect();
+        let e = li[1].parse::<i32>().unwrap();
+        let x = li[0].parse::<f64>().unwrap() * 10_f64.powi(e);
+
+        println!("{} : {:>8.2} {}", file_path, x, units[i]);
     }
 }
