@@ -3,20 +3,20 @@ package main
 import (
 	"example.com/calc_size/utils"
 	"fmt"
+	flag "github.com/spf13/pflag"
 	"os"
 )
 
 func main() {
 
-	args := os.Args
-
 	// 输出帮助信息
-	if len(args) == 2 && (args[1] == "--help" || args[1] == "--h" || args[1] == "-help" || args[1] == "-h") {
-		fmt.Println(utils.HelpInfo)
-		return
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "%s\n", utils.HelpInfo)
+		flag.PrintDefaults()
 	}
+	flag.Parse()
 
-	file_paths := args[1:] // 文件路径
+	file_paths := os.Args[1:] // 文件路径
 
 	file_sizes := utils.GetFileSize(file_paths) // 文件大小
 
