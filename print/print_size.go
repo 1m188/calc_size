@@ -1,12 +1,13 @@
-package main
+package print
 
 import (
+	"example.com/calc_size/data"
 	"fmt"
 	"strings"
 )
 
 // 输出文件大小
-func getSizeInFmt(file_sizes []FileSize) string {
+func GetSizeInFmt(file_sizes []data.FileSize) string {
 
 	// 补全所有文件路径长度到最长文件路径长度
 	file_paths := make([]string, len(file_sizes))
@@ -62,7 +63,7 @@ func getSizeInFmt(file_sizes []FileSize) string {
 }
 
 // 获取文件大小(JSON格式)
-func getSizeInJSON(file_sizes []FileSize) string {
+func GetSizeInJSON(file_sizes []data.FileSize) string {
 	res := make([]string, len(file_sizes))
 	for i, file_size := range file_sizes {
 		res[i] = fmt.Sprintf(`{"path": "%s", "size": "%s"}`, file_size.Path, file_size.Size.Text(10))
@@ -71,7 +72,7 @@ func getSizeInJSON(file_sizes []FileSize) string {
 }
 
 // 获取文件大小(CSV格式)
-func getSizeInCSV(file_sizes []FileSize) string {
+func GetSizeInCSV(file_sizes []data.FileSize) string {
 	res := make([]string, len(file_sizes))
 	for i, file_size := range file_sizes {
 		res[i] = fmt.Sprintf("%s,%s\n", file_size.Path, file_size.Size.Text(10))

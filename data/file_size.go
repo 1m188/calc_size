@@ -1,10 +1,8 @@
-package main
+package data
 
 import (
 	"math/big"
 )
-
-/***************************************************************************************** */
 
 // 文件/目录大小信息
 type FileSize struct {
@@ -50,5 +48,3 @@ func (fs *FileSize) GetSizeWithUnit(f int, prec uint) (string, string) {
 
 	return size.Text('f', f), unit
 }
-
-/***************************************************************************************** */

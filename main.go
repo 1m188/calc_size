@@ -1,16 +1,27 @@
 package main
 
 import (
+	gfs "example.com/calc_size/get_file_size"
+	"example.com/calc_size/print"
 	"fmt"
 	flag "github.com/spf13/pflag"
 	"os"
 )
 
+// 帮助信息
+const HELPINFO string = `输入文件名或文件夹名称来计算文件或文件夹大小: 
+	calc_size -p [Your file name or folder name]
+
+或者是连续计算多个文件或者文件夹的大小: 
+	calc_size -p [file1],[file2],[file3] ...
+
+输出-1则表示该文件不存在或文件夹存在路径错误或者其他错误`
+
 func main() {
 
 	// 输出帮助信息
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "%s\n", helpInfo)
+		fmt.Fprintf(os.Stderr, "%s\n", HELPINFO)
 		flag.PrintDefaults()
 	}
 
@@ -23,15 +34,19 @@ func main() {
 	flag.StringSliceVarP(&file_paths, "paths", "p", []string{}, "文件/目录路径(英文逗号分隔)")
 	flag.Parse()
 
-	file_sizes := getFilesSize(file_paths) // 文件大小
-
 	res := ""
 	if json {
-		res = getSizeInJSON(file_sizes) // 打印json格式文件大小
+		gfs.IsCnt = false
+		file_sizes := gfs.GetFilesSize(file_paths) // 文件大小
+		res = print.GetSizeInJSON(file_sizes)      // 打印json格式文件大小
 	} else if csv {
-		res = getSizeInCSV(file_sizes) // 打印csv格式文件大小
+		gfs.IsCnt = false
+		file_sizes := gfs.GetFilesSize(file_paths) // 文件大小
+		res = print.GetSizeInCSV(file_sizes)       // 打印csv格式文件大小
 	} else {
-		res = getSizeInFmt(file_sizes) // 打印文件大小
+		gfs.IsCnt = true
+		file_sizes := gfs.GetFilesSize(file_paths) // 文件大小
+		res = print.GetSizeInFmt(file_sizes)       // 打印文件大小
 	}
 	fmt.Print(res)
 
