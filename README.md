@@ -5,13 +5,14 @@ calculate the file or folder size
 ## Usage
 
 ```shell
-calc_size --help
+calc_size(.exe) --help
 ```
 
 ## Example
 
+### Normal
 ```shell
-calc_size a.txt . .. D:/Code/ /path/not/exist
+calc_size(.exe) -p a.txt,.,..,D:/Code/,/path/not/exist
 ```
 
 ```shell
@@ -20,6 +21,28 @@ a.txt            :   1.00  B
 ..               :  10.00 GB
 D:/Code/         :  12.00 GB
 /path/not/exist  :  -1.00  B
+```
+
+### JSON
+```shell
+calc_size(.exe) -p a.txt,.,..,D:/Code/,/path/not/exist -j
+```
+
+```json
+[{"path":"a.txt","size":"1"},{"path":".","size":"12582912"},{"path":"..","size":"10737418240"},{"path":"D:/Code/","size":"12884901888"},{"path":"/path/not/exist","size":"-1"}]
+```
+
+### CSV
+```shell
+calc_size(.exe) -p a.txt,.,..,D:/Code/,/path/not/exist -c
+```
+
+```csv
+a.txt,1
+.,12582912
+..,10737418240
+D:/Code/,12884901888
+/path/not/exist,-1
 ```
 
 ## TODO
