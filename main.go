@@ -19,6 +19,7 @@ func main() {
 
 	file_sizes := getFilesSize(file_paths) // 文件大小
 
-	printSize(file_paths, file_sizes) // 打印文件大小
+	res := getSizeInFmt(file_sizes) // 打印文件大小
+	fmt.Print(res)
 
 }

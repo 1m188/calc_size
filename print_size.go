@@ -2,14 +2,17 @@ package main
 
 import (
 	"fmt"
-	"math/big"
 	"strings"
 )
 
 // 输出文件大小
-func printSize(file_paths []string, file_sizes []string) {
+func getSizeInFmt(file_sizes []FileSize) string {
 
 	// 补全所有文件路径长度到最长文件路径长度
+	file_paths := make([]string, len(file_sizes))
+	for i, file_size := range file_sizes {
+		file_paths[i] = file_size.Path
+	}
 	leftLen := 0
 	for _, file_path := range file_paths {
 		if len(file_path) > leftLen {
@@ -25,32 +28,9 @@ func printSize(file_paths []string, file_sizes []string) {
 
 	// 转换文件大小单位
 	file_sizes_str := make([]string, len(file_sizes)) // 转换后的文件大小
-	prec := uint(512)                                 // 精度
-	for i := range file_paths {
-		size, _ := big.NewFloat(0).SetPrec(prec).SetString(file_sizes[i])
-		two := big.NewFloat(1024).SetPrec(prec)
-		unit := " B"
-
-		if size.Cmp(two) > 0 {
-			size.Quo(size, two)
-			unit = "KB"
-
-			if size.Cmp(two) > 0 {
-				size.Quo(size, two)
-				unit = "MB"
-
-				if size.Cmp(two) > 0 {
-					size.Quo(size, two)
-					unit = "GB"
-				}
-			}
-		}
-
-		if size.Cmp(big.NewFloat(0).SetPrec(prec)) < 0 {
-			unit = "  "
-		}
-
-		file_sizes_str[i] = fmt.Sprintf("%.2f %s", size, unit)
+	units := make([]string, len(file_sizes))          // 转换后的文件大小单位
+	for i, file_size := range file_sizes {
+		file_sizes_str[i], units[i] = file_size.GetSizeWithUnit(2, 512)
 	}
 
 	// 补全所有文件大小长度到最长文件大小长度
@@ -68,7 +48,9 @@ func printSize(file_paths []string, file_sizes []string) {
 	}
 
 	// 输出文件路径和文件大小
+	res := make([]string, len(file_sizes))
 	for i := range file_paths {
-		fmt.Printf("%s  :  %s\n", file_paths[i], file_sizes_str[i])
+		res[i] = fmt.Sprintf("%s : %s %s\n", file_paths[i], file_sizes_str[i], units[i])
 	}
+	return strings.Join(res, "")
 }
