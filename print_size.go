@@ -35,7 +35,7 @@ func getSizeInFmt(file_sizes []FileSize) string {
 			units[i] = " B"
 		}
 		if units[i] == "" {
-		    units[i] = "  "
+			units[i] = "  "
 		}
 	}
 
@@ -57,6 +57,24 @@ func getSizeInFmt(file_sizes []FileSize) string {
 	res := make([]string, len(file_sizes))
 	for i := range file_paths {
 		res[i] = fmt.Sprintf("%s : %s %s\n", file_paths[i], file_sizes_str[i], units[i])
+	}
+	return strings.Join(res, "")
+}
+
+// 获取文件大小(JSON格式)
+func getSizeInJSON(file_sizes []FileSize) string {
+	res := make([]string, len(file_sizes))
+	for i, file_size := range file_sizes {
+		res[i] = fmt.Sprintf(`{"path": "%s", "size": "%s"}`, file_size.Path, file_size.Size.Text(10))
+	}
+	return "[" + strings.Join(res, ",") + "]" + "\n"
+}
+
+// 获取文件大小(CSV格式)
+func getSizeInCSV(file_sizes []FileSize) string {
+	res := make([]string, len(file_sizes))
+	for i, file_size := range file_sizes {
+		res[i] = fmt.Sprintf("%s,%s\n", file_size.Path, file_size.Size.Text(10))
 	}
 	return strings.Join(res, "")
 }
