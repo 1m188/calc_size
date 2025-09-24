@@ -31,6 +31,12 @@ func getSizeInFmt(file_sizes []FileSize) string {
 	units := make([]string, len(file_sizes))          // 转换后的文件大小单位
 	for i, file_size := range file_sizes {
 		file_sizes_str[i], units[i] = file_size.GetSizeWithUnit(2, 512)
+		if units[i] == "B" {
+			units[i] = " B"
+		}
+		if units[i] == "" {
+		    units[i] = "  "
+		}
 	}
 
 	// 补全所有文件大小长度到最长文件大小长度

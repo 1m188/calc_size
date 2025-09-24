@@ -22,7 +22,7 @@ func (fs *FileSize) GetSizeWithUnit(f int, prec uint) (string, string) {
 
 	size := big.NewFloat(0).SetPrec(prec).SetInt(&fs.Size)
 	x := big.NewFloat(1024).SetPrec(prec)
-	unit := " B"
+	unit := "B"
 
 	if size.Cmp(x) > 0 {
 		size.Quo(size, x)
@@ -45,7 +45,7 @@ func (fs *FileSize) GetSizeWithUnit(f int, prec uint) (string, string) {
 	}
 
 	if size.Cmp(big.NewFloat(0).SetPrec(prec)) < 0 {
-		unit = "  "
+		unit = ""
 	}
 
 	return size.Text('f', f), unit
