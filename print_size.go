@@ -1,4 +1,4 @@
-package utils
+package main
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 )
 
 // 输出文件大小
-func PrintSize(file_paths []string, file_sizes []string) {
+func printSize(file_paths []string, file_sizes []string) {
 
 	// 补全所有文件路径长度到最长文件路径长度
 	leftLen := 0

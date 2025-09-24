@@ -1,4 +1,4 @@
-package utils
+package main
 
 import (
 	"fmt"
@@ -41,7 +41,7 @@ func getFileSize(file_path string) (size string) {
 }
 
 // 获取文件/文件夹大小，单位为字节
-func GetFileSize(file_paths []string) []string {
+func getFilesSize(file_paths []string) []string {
 	file_sizes := make([]string, len(file_paths)) // 计算出来的文件大小
 	var wg sync.WaitGroup                         // 等待所有goroutine完成
 
