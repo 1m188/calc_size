@@ -2,6 +2,7 @@ package get_files_size
 
 import (
 	"example.com/calc_size/data"
+	rtp "example.com/calc_size/get_file_size/internal/rtprint"
 	"fmt"
 	"math/big"
 	"os"
@@ -9,18 +10,7 @@ import (
 	"sync"
 )
 
-var count uint64     // 已完成多少个文件的大小扫描
-var mutex sync.Mutex // 互斥锁
-
 var IsCnt bool // 是否需要统计已完成多少个文件的大小扫描
-
-/* 输出已完成多少个文件的扫描 */
-func print_count() {
-	mutex.Lock()
-	count++
-	fmt.Printf("\r已完成 %d 个文件的扫描", count) // 打印进度
-	mutex.Unlock()
-}
 
 /*
 获取文件/文件夹大小，返回 Size=-1 表示存在错误
@@ -38,7 +28,7 @@ func getFileSize(file_path string) data.FileSize {
 	if !file_info.IsDir() {
 		size.Size = *big.NewInt(file_info.Size())
 		if IsCnt {
-			print_count()
+			rtp.CountAddPrint(1)
 		}
 		return size
 	}
@@ -53,7 +43,7 @@ func getFileSize(file_path string) data.FileSize {
 		if !info.IsDir() {
 			total.Add(total, big.NewInt(info.Size()))
 			if IsCnt {
-				print_count()
+				rtp.CountAddPrint(1)
 			}
 		}
 
@@ -72,6 +62,10 @@ func getFileSize(file_path string) data.FileSize {
 func GetFilesSize(file_paths []string) []data.FileSize {
 	file_sizes := make([]data.FileSize, len(file_paths)) // 计算出来的文件大小
 	var wg sync.WaitGroup                                // 等待所有goroutine完成
+
+	if IsCnt {
+		rtp.Init()
+	}
 
 	for i, file_path := range file_paths {
 		wg.Go(func() {
