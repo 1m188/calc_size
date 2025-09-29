@@ -28,23 +28,24 @@ func main() {
 	var json bool
 	var file_paths []string
 	var csv bool
+	var cnt bool
 
 	flag.BoolVarP(&json, "json", "j", false, "以json格式输出")
 	flag.BoolVarP(&csv, "csv", "c", false, "以csv格式输出")
 	flag.StringSliceVarP(&file_paths, "paths", "p", []string{}, "文件/目录路径(英文逗号分隔)")
+	flag.BoolVarP(&cnt, "count", "n", false, "是否实时输出统计文件数量")
 	flag.Parse()
 
-	res := ""
+	gfs.IsCnt = cnt
+
+	var res string
 	if json {
-		gfs.IsCnt = false
 		file_sizes := gfs.GetFilesSize(file_paths) // 文件大小
 		res = print.GetSizeInJSON(file_sizes)      // 打印json格式文件大小
 	} else if csv {
-		gfs.IsCnt = false
 		file_sizes := gfs.GetFilesSize(file_paths) // 文件大小
 		res = print.GetSizeInCSV(file_sizes)       // 打印csv格式文件大小
 	} else {
-		gfs.IsCnt = true
 		file_sizes := gfs.GetFilesSize(file_paths) // 文件大小
 		res = print.GetSizeInFmt(file_sizes)       // 打印文件大小
 	}
