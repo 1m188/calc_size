@@ -179,6 +179,8 @@ func TestRoutinePerformance(t *testing.T) {
 		}
 	}
 
+	// 小规模单线程占优；大规模多线程占优
+
 	fmt.Println("规模1")
 	test([]int64{
 		0, 10 + 1, 1024 + 12, 1024*1024*2 + 123, 1024*1024*1024 + 1234,
