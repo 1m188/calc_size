@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
+	"math"
+	"os"
+
 	gfs "example.com/calc_size/get_file_size"
 	"example.com/calc_size/print"
-	"fmt"
 	flag "github.com/spf13/pflag"
-	"os"
 )
 
 // 帮助信息
@@ -29,14 +31,17 @@ func main() {
 	var file_paths []string
 	var csv bool
 	var cnt bool
+	var depth int // 递归最大深度
 
 	flag.BoolVarP(&json, "json", "j", false, "以json格式输出")
 	flag.BoolVarP(&csv, "csv", "c", false, "以csv格式输出")
 	flag.StringSliceVarP(&file_paths, "paths", "p", []string{}, "文件/目录路径(英文逗号分隔)")
 	flag.BoolVarP(&cnt, "count", "n", false, "是否实时输出统计文件数量")
+	flag.IntVarP(&depth, "depth", "d", math.MaxInt, "递归最大深度")
 	flag.Parse()
 
 	gfs.IsCnt = cnt
+	gfs.MaxDepth = depth
 
 	var res string
 	if json {

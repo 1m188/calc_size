@@ -1,16 +1,19 @@
 package get_files_size
 
 import (
-	"example.com/calc_size/data"
-	rtp "example.com/calc_size/get_file_size/internal/rtprint"
 	"fmt"
 	"math/big"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
+
+	"example.com/calc_size/data"
+	rtp "example.com/calc_size/get_file_size/internal/rtprint"
 )
 
-var IsCnt bool // 是否需要统计已完成多少个文件的大小扫描
+var IsCnt bool   // 是否需要统计已完成多少个文件的大小扫描
+var MaxDepth int // 最大目录递归深度
 
 /*
 获取文件/文件夹大小，返回 Size=-1 表示存在错误
@@ -33,11 +36,23 @@ func getFileSize(file_path string) data.FileSize {
 		return size
 	}
 
+	// 计算起始目录的深度
+	rootDepth := strings.Count(filepath.Clean(file_path), string(os.PathSeparator))
+
 	total := big.NewInt(0)
 	filepath.Walk(file_path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			total.SetInt64(-1)
 			return err
+		}
+
+		// 计算当前路径的深度
+		currentDepth := strings.Count(filepath.Clean(path), string(os.PathSeparator))
+		// 计算相对深度
+		relativeDepth := currentDepth - rootDepth
+		// 如果超过最大深度，则跳过该目录
+		if info.IsDir() && relativeDepth > int(MaxDepth) {
+			return filepath.SkipDir
 		}
 
 		if !info.IsDir() {
