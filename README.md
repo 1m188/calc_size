@@ -50,6 +50,11 @@ D:/Code/,12884901888
 calc_size(.exe) -p D:/Code/ -d 2
 ```
 
+### 大文件 Top-N
+```shell
+calc_size(.exe) -p D:/Code/ -t 3
+```
+
 ## TODO
 
 - [ √ ] 用 pflag/cobra 等替代手写 os.Args，支持长选项、子命令、自动 help 等功能。
@@ -60,4 +65,4 @@ calc_size(.exe) -p D:/Code/ -d 2
 - [ √ ] 加 .github/workflows 做 CI 自动发布 Release。
 - [ ] 排除/包含规则：`-e node_modules -e *.log` 支持通配符/正则忽略；`-i "*.go"` 只统计 Go 源文件等。
 - [ √ ] 深度限制：`-d 3` 只统计 3 层子目录，快速看顶层分布。
-- [ ] 大文件 Top-N：`-t 20` 列出占用最大的 20 个文件（类似 ncdu）。
+- [ √ ] 大文件 Top-N：`-t 20` 列出占用最大的 20 个文件（类似 ncdu）。
