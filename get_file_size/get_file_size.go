@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 
@@ -14,6 +15,9 @@ import (
 
 var IsCnt bool   // 是否需要统计已完成多少个文件的大小扫描
 var MaxDepth int // 最大目录递归深度
+
+var Top int                 // 输出前几大文件
+var TopSize []data.FileSize // 输出前几大文件的大小
 
 /*
 获取文件/文件夹大小，返回 Size=-1 表示存在错误
@@ -56,6 +60,7 @@ func getFileSize(file_path string) data.FileSize {
 		}
 
 		if !info.IsDir() {
+			TopSize = append(TopSize, data.FileSize{Path: path, Size: *big.NewInt(info.Size())})
 			total.Add(total, big.NewInt(info.Size()))
 			if IsCnt {
 				rtp.CountAddPrint(1)
@@ -92,6 +97,13 @@ func GetFilesSize(file_paths []string) []data.FileSize {
 
 	if IsCnt {
 		fmt.Println()
+	}
+
+	// 一旦需要输出前若干大的文件及其路径，则进行降序排序
+	if Top > 0 {
+		sort.Slice(TopSize, func(i, j int) bool {
+			return TopSize[i].Size.Cmp(&TopSize[j].Size) > 0
+		})
 	}
 
 	return file_sizes

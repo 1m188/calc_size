@@ -32,16 +32,19 @@ func main() {
 	var csv bool
 	var cnt bool
 	var depth int // 递归最大深度
+	var top int   // 输出前几大文件
 
 	flag.BoolVarP(&json, "json", "j", false, "以json格式输出")
 	flag.BoolVarP(&csv, "csv", "c", false, "以csv格式输出")
 	flag.StringSliceVarP(&file_paths, "paths", "p", []string{}, "文件/目录路径(英文逗号分隔)")
 	flag.BoolVarP(&cnt, "count", "n", false, "是否实时输出统计文件数量")
 	flag.IntVarP(&depth, "depth", "d", math.MaxInt, "递归最大深度")
+	flag.IntVarP(&top, "top", "t", 0, "输出前几大文件")
 	flag.Parse()
 
 	gfs.IsCnt = cnt
 	gfs.MaxDepth = depth
+	gfs.Top = top
 
 	var res string
 	if json {
@@ -55,5 +58,12 @@ func main() {
 		res = print.GetSizeInFmt(file_sizes)       // 打印文件大小
 	}
 	fmt.Print(res)
+
+	// 输出前几大文件
+	if top > 0 {
+		fmt.Printf("\nTop %d: \n", top)
+		res = print.GetSizeInFmt(gfs.TopSize[:top])
+		fmt.Print(res)
+	}
 
 }
