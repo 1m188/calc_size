@@ -14,7 +14,7 @@ type FileSize struct {
 获取大小（带单位）
   - f: 几位小数
   - prec: 精度
-  - 返回值：带单位的字符串，单位
+  - 返回值：数字的字符串，单位
 */
 func (fs *FileSize) GetSizeWithUnit(f int, prec uint) (string, string) {
 
