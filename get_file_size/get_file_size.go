@@ -18,6 +18,30 @@ var MaxDepth int // 最大目录递归深度
 
 var Top int                 // 输出前几大文件
 var TopSize []data.FileSize // 输出前几大文件的大小
+// 小根堆调整
+func adjust(h *[]data.FileSize, index int) {
+	for {
+		var idx int = index
+		if idx*2+1 < len(*h) && (*h)[idx].Size.Cmp(&(*h)[idx*2+1].Size) > 0 {
+			idx = idx*2 + 1
+		}
+		if idx*2+2 < len(*h) && (*h)[idx].Size.Cmp(&(*h)[idx*2+2].Size) > 0 {
+			idx = idx*2 + 2
+		}
+		if index == idx {
+			break
+		}
+		(*h)[index], (*h)[idx] = (*h)[idx], (*h)[index]
+		index = idx
+	}
+}
+
+// 构建堆
+func buildHeap(h *[]data.FileSize) {
+	for i := (len(*h) - 1 - 1) / 2; i >= 0; i-- {
+		adjust(h, i)
+	}
+}
 
 /*
 获取文件/文件夹大小，返回 Size=-1 表示存在错误
@@ -60,7 +84,22 @@ func getFileSize(file_path string) data.FileSize {
 		}
 
 		if !info.IsDir() {
-			TopSize = append(TopSize, data.FileSize{Path: path, Size: *big.NewInt(info.Size())})
+
+			if Top > 0 { // 输出前几大文件
+				file := data.FileSize{Path: path, Size: *big.NewInt(info.Size())}
+				if len(TopSize) < Top {
+					TopSize = append(TopSize, file)
+					if len(TopSize) == Top {
+						buildHeap(&TopSize)
+					}
+				} else {
+					if file.Size.Cmp(&TopSize[0].Size) > 0 {
+						TopSize[0] = file
+						adjust(&TopSize, 0)
+					}
+				}
+			}
+
 			total.Add(total, big.NewInt(info.Size()))
 			if IsCnt {
 				rtp.CountAddPrint(1)
