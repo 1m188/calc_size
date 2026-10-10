@@ -21,6 +21,12 @@ main {
   padding: 2.5rem 1.25rem 4rem;
 }
 
+/* 拖拽悬停提示 */
+main.dragging {
+  outline: 2px dashed #3b82f6;
+  outline-offset: -10px;
+}
+
 h1 {
   margin: 0 0 0.25rem;
   font-size: 1.5rem;
@@ -31,11 +37,13 @@ h1 {
   color: #5b6472;
 }
 
+/* ---- 选择按钮与菜单 ---- */
 .actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin: 0 0 1rem;
+  align-items: flex-start;
+  margin: 0 0 0.5rem;
 }
 
 .btn {
@@ -49,16 +57,66 @@ h1 {
   user-select: none;
 }
 
+button.btn {
+  font: inherit;
+  color: inherit;
+}
+
 .btn:hover {
   border-color: #3b82f6;
   color: #3b82f6;
 }
 
-.btn input {
+.menu {
+  position: relative;
+}
+
+summary.btn {
+  list-style: none;
+}
+
+summary.btn::-webkit-details-marker {
+  display: none;
+}
+
+.menu-list {
   position: absolute;
-  inset: 0;
-  opacity: 0;
+  z-index: 10;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 10rem;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #c9ced8;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.menu-item {
+  position: relative;
+  display: block;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
   cursor: pointer;
+}
+
+.menu-item:hover {
+  background: #eef4ff;
+}
+
+.menu-item input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.hint {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  color: #8a909c;
 }
 
 .status {
@@ -67,6 +125,7 @@ h1 {
   color: #8a5a00;
 }
 
+/* ---- 结果表 ---- */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -89,6 +148,69 @@ td:last-child {
 
 thead th {
   border-bottom: 2px solid #c9ced8;
+}
+
+/* 列头排序按钮与箭头 */
+th button.sort {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+#th-size button.sort {
+  justify-content: flex-end;
+}
+
+.arrow::after {
+  content: "";
+}
+
+th[aria-sort="ascending"] .arrow::after {
+  content: "▲";
+}
+
+th[aria-sort="descending"] .arrow::after {
+  content: "▼";
+}
+
+/* 树形展开 */
+tbody tr:hover {
+  background: #f1f4f9;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4em;
+  height: 1.4em;
+  margin-right: 0.35rem;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: inherit;
+  font-size: 0.8em;
+  cursor: pointer;
+}
+
+.toggle:hover {
+  background: #e3eaf5;
+}
+
+.dir-name {
+  cursor: pointer;
+}
+
+.dir-name:hover {
+  color: #3b82f6;
 }
 
 tfoot th,
@@ -115,7 +237,12 @@ tbody tr {
     color: #e6e8ee;
   }
 
+  main.dragging {
+    outline-color: #60a5fa;
+  }
+
   .lead,
+  .hint,
   .note {
     color: #9aa1ad;
   }
@@ -130,6 +257,15 @@ tbody tr {
     color: #60a5fa;
   }
 
+  .menu-list {
+    background: #1f232b;
+    border-color: #3a404c;
+  }
+
+  .menu-item:hover {
+    background: #262c37;
+  }
+
   th,
   td {
     border-bottom-color: #2a2f39;
@@ -142,5 +278,17 @@ tbody tr {
   tfoot th,
   tfoot td {
     border-top-color: #3a404c;
+  }
+
+  tbody tr:hover {
+    background: #1c2027;
+  }
+
+  .toggle:hover {
+    background: #2a3040;
+  }
+
+  .dir-name:hover {
+    color: #60a5fa;
   }
 }
