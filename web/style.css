@@ -1,0 +1,146 @@
+/* calc_size web —— 极简样式，随系统明暗 */
+:root {
+  color-scheme: light dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.6;
+  background: #fafafa;
+  color: #1f2430;
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+}
+
+h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+}
+
+.lead {
+  margin: 0 0 1.25rem;
+  color: #5b6472;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+}
+
+.btn {
+  position: relative;
+  display: inline-block;
+  padding: 0.5rem 1.1rem;
+  border: 1px solid #c9ced8;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  user-select: none;
+}
+
+.btn:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.btn input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.status {
+  min-height: 1.5em;
+  margin: 0 0 0.5rem;
+  color: #8a5a00;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+th,
+td {
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid #e3e6ec;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+th:last-child,
+td:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+
+thead th {
+  border-bottom: 2px solid #c9ced8;
+}
+
+tfoot th,
+tfoot td {
+  border-top: 2px solid #c9ced8;
+  border-bottom: none;
+}
+
+/* 大目录时跳过屏外行的渲染，避免长列表卡顿 */
+tbody tr {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 2.1rem;
+}
+
+.note {
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
+  color: #8a909c;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #16181d;
+    color: #e6e8ee;
+  }
+
+  .lead,
+  .note {
+    color: #9aa1ad;
+  }
+
+  .btn {
+    background: #1f232b;
+    border-color: #3a404c;
+  }
+
+  .btn:hover {
+    border-color: #60a5fa;
+    color: #60a5fa;
+  }
+
+  th,
+  td {
+    border-bottom-color: #2a2f39;
+  }
+
+  thead th {
+    border-bottom-color: #3a404c;
+  }
+
+  tfoot th,
+  tfoot td {
+    border-top-color: #3a404c;
+  }
+}

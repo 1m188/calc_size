@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="calc_size 网页版：选择本地文件或文件夹，在浏览器中计算大小，数据不上传。" />
+    <title>calc_size — 文件/文件夹大小计算</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script type="module" src="./js/app.js"></script>
+  </head>
+  <body>
+    <main>
+      <h1>calc_size</h1>
+      <p class="lead">选择本地文件或文件夹，立即计算大小。所有计算都在你的浏览器中完成，不会上传任何数据。</p>
+
+      <div class="actions">
+        <label class="btn">选择文件<input type="file" id="pick-files" multiple /></label>
+        <label class="btn">选择文件夹<input type="file" id="pick-folder" webkitdirectory /></label>
+      </div>
+
+      <p id="status" class="status" role="status"></p>
+
+      <table id="result" hidden>
+        <thead>
+          <tr>
+            <th scope="col">路径</th>
+            <th scope="col">大小</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+        <tfoot>
+          <tr>
+            <th scope="row" id="total-label">总计</th>
+            <td id="total-size"></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <p class="note">
+        说明：浏览器无法枚举的文件（无权限、系统隐藏文件）与空目录不会出现在结果中，
+        因此数字可能与命令行版本略有差异。
+      </p>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "calc-size-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "calc_size 的网页版：纯静态、零依赖，在浏览器中计算文件/文件夹大小",
+  "scripts": {
+    "test": "node --test"
+  }
+}
