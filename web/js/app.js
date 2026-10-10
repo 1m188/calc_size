@@ -13,12 +13,14 @@ const thName = document.getElementById('th-name');
 const thSize = document.getElementById('th-size');
 const totalLabelEl = document.getElementById('total-label');
 const totalSizeEl = document.getElementById('total-size');
+const dropOverlay = document.getElementById('drop-overlay');
 
 // ---- 状态 ----
 const selections = new Map(); // 顶层名 -> 根节点；后选择的同名项覆盖旧结果
 const expanded = new Set(); // 已展开目录的 path
 let sortKey = 'name';
 let sortDir = 'asc'; // 大小列首次点击为降序（找大文件更实用）
+let lastToggled = null; // { path, depth }：最近一次展开/折叠的目录，用于子树入场动画
 
 // ---- 选择入口：菜单 ----
 fileInput.addEventListener('change', () => {
@@ -36,7 +38,7 @@ folderInput.addEventListener('change', () => {
 clearBtn.addEventListener('click', () => {
   selections.clear();
   expanded.clear();
-  render();
+  render(false);
   statusEl.textContent = '已清空。';
 });
 
@@ -45,12 +47,12 @@ mainEl.addEventListener('dragenter', onDragOver);
 mainEl.addEventListener('dragover', onDragOver);
 mainEl.addEventListener('dragleave', (e) => {
   if (!mainEl.contains(e.relatedTarget)) {
-    mainEl.classList.remove('dragging');
+    dropOverlay.classList.remove('show');
   }
 });
 mainEl.addEventListener('drop', async (e) => {
   e.preventDefault();
-  mainEl.classList.remove('dragging');
+  dropOverlay.classList.remove('show');
 
   const entries = [];
   const walkers = [];
@@ -71,7 +73,7 @@ mainEl.addEventListener('drop', async (e) => {
 
 function onDragOver(e) {
   e.preventDefault(); // 允许 drop
-  mainEl.classList.add('dragging');
+  dropOverlay.classList.add('show');
 }
 
 // 递归枚举拖入的文件/目录；readEntries 每次最多返回 100 条，必须循环读到空数组为止
@@ -107,24 +109,43 @@ function addEntries(entries) {
       expanded.add(root.path); // 顶层目录默认展开一层
     }
   }
-  render();
+  render(true);
+  flashTotal();
 }
 
 // ---- 渲染 ----
-function render() {
+// animateAll：新数据到达时让可见行整体级联入场；
+// 否则只有 lastToggled 的子树行入场（展开/折叠的局部动画）。
+function render(animateAll = false) {
   const roots = [...selections.values()];
-  rowsEl.replaceChildren();
 
-  const fragment = document.createDocumentFragment();
-  const appendRows = (nodes, depth) => {
+  // 先收集当前可见的节点（含排序），再统一渲染
+  const visible = [];
+  const collect = (nodes, depth) => {
     for (const node of [...nodes].sort(compareNodes(sortKey, sortDir))) {
-      fragment.append(buildRow(node, depth));
+      visible.push({ node, depth });
       if (node.isDir && node.children.length > 0 && expanded.has(node.path)) {
-        appendRows(node.children, depth + 1);
+        collect(node.children, depth + 1);
       }
     }
   };
-  appendRows(roots, 0);
+  collect(roots, 0);
+
+  // 比例条基准：当前可见节点中的最大值
+  const maxNode = visible.reduce((max, v) => Math.max(max, v.node.size), 0);
+
+  rowsEl.replaceChildren();
+  const fragment = document.createDocumentFragment();
+  let animatedCount = 0; // 级联动画上限，超过后直接显示，避免大列表卡顿
+  for (const { node, depth } of visible) {
+    const inSubtree = lastToggled !== null && node.path.startsWith(`${lastToggled.path}/`);
+    let anim = null;
+    if ((animateAll || inSubtree) && animatedCount < 40) {
+      anim = { delay: animatedCount * 18 };
+      animatedCount += 1;
+    }
+    fragment.append(buildRow(node, depth, anim, maxNode));
+  }
   rowsEl.append(fragment);
 
   let total = 0;
@@ -140,11 +161,23 @@ function render() {
   clearBtn.hidden = roots.length === 0;
   syncSortHeader(thName, 'name');
   syncSortHeader(thSize, 'size');
+  lastToggled = null; // 本次渲染已消费
 }
 
 // 只渲染可见行：折叠的目录不渲染其子树
-function buildRow(node, depth) {
+function buildRow(node, depth, anim, maxNode) {
   const tr = document.createElement('tr');
+  if (anim) {
+    tr.classList.add('enter');
+    tr.style.setProperty('--d', `${anim.delay}ms`);
+  }
+  if (lastToggled !== null && node.path === lastToggled.path) {
+    tr.classList.add('just-toggled'); // 箭头旋转补间
+  }
+  if (maxNode > 0 && node.size > 0) {
+    tr.style.setProperty('--w', `${Math.min(100, (node.size / maxNode) * 100)}%`);
+  }
+
   const pathTd = document.createElement('td');
   pathTd.style.paddingLeft = `${0.5 + depth * 1.1}rem`;
   pathTd.title = node.path;
@@ -153,14 +186,14 @@ function buildRow(node, depth) {
     const isOpen = expanded.has(node.path);
     const toggle = document.createElement('button');
     toggle.type = 'button';
-    toggle.className = 'toggle';
-    toggle.textContent = isOpen ? '▾' : '▸';
+    toggle.className = isOpen ? 'toggle open' : 'toggle';
+    toggle.textContent = '▸';
     toggle.setAttribute('aria-expanded', String(isOpen));
-    toggle.addEventListener('click', () => toggleNode(node));
+    toggle.addEventListener('click', () => toggleNode(node, depth));
     const name = document.createElement('span');
     name.className = 'dir-name';
     name.textContent = node.name;
-    name.addEventListener('click', () => toggleNode(node));
+    name.addEventListener('click', () => toggleNode(node, depth));
     pathTd.append(toggle, name);
   } else {
     pathTd.textContent = node.name;
@@ -172,13 +205,14 @@ function buildRow(node, depth) {
   return tr;
 }
 
-function toggleNode(node) {
+function toggleNode(node, depth) {
   if (expanded.has(node.path)) {
     expanded.delete(node.path);
   } else {
     expanded.add(node.path);
   }
-  render();
+  lastToggled = { path: node.path, depth };
+  render(false);
 }
 
 function countFiles(node) {
@@ -190,6 +224,12 @@ function countFiles(node) {
     count += countFiles(child);
   }
   return count;
+}
+
+function flashTotal() {
+  totalSizeEl.classList.remove('flash');
+  void totalSizeEl.offsetWidth; // 强制回流以重启动画
+  totalSizeEl.classList.add('flash');
 }
 
 // ---- 排序 ----
@@ -204,7 +244,7 @@ for (const [buttonId, key, firstDir] of [
       sortKey = key;
       sortDir = firstDir;
     }
-    render();
+    render(false);
   });
 }
 

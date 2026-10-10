@@ -9,49 +9,59 @@
     <script type="module" src="./js/app.js"></script>
   </head>
   <body>
+    <!-- 背景装饰光斑（纯装饰） -->
+    <div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
+
     <main>
-      <h1>calc_size</h1>
-      <p class="lead">选择本地文件或文件夹，立即计算大小。所有计算都在你的浏览器中完成，不会上传任何数据。</p>
+      <header class="hero">
+        <h1>calc_size</h1>
+        <p class="lead">选择本地文件或文件夹，立即计算大小。所有计算都在你的浏览器中完成，不会上传任何数据。</p>
+      </header>
 
-      <div class="actions">
-        <details id="pick-menu" class="menu">
-          <summary class="btn">选择文件或文件夹</summary>
-          <ul class="menu-list">
-            <li><label class="menu-item">文件…<input type="file" id="pick-files" multiple /></label></li>
-            <li><label class="menu-item">文件夹…<input type="file" id="pick-folder" webkitdirectory /></label></li>
-          </ul>
-        </details>
-        <button type="button" id="clear" class="btn" hidden>清空</button>
-      </div>
+      <section class="card">
+        <div class="actions">
+          <details id="pick-menu" class="menu">
+            <summary class="btn btn-primary">选择文件或文件夹</summary>
+            <ul class="menu-list">
+              <li><label class="menu-item">文件…<input type="file" id="pick-files" multiple /></label></li>
+              <li><label class="menu-item">文件夹…<input type="file" id="pick-folder" webkitdirectory /></label></li>
+            </ul>
+          </details>
+          <button type="button" id="clear" class="btn btn-ghost" hidden>清空</button>
+        </div>
 
-      <p class="hint">也可以把多个文件和文件夹一起拖进页面（可混合多选）；多次选择会累计到下面的列表。</p>
+        <p class="hint">也可以把多个文件和文件夹一起拖进页面（可混合多选）；多次选择会累计到下面的列表。</p>
 
-      <p id="status" class="status" role="status"></p>
+        <p id="status" class="status" role="status"></p>
 
-      <table id="result" hidden>
-        <thead>
-          <tr>
-            <th scope="col" id="th-name" aria-sort="ascending">
-              <button type="button" id="sort-name" class="sort">名称<span class="arrow"></span></button>
-            </th>
-            <th scope="col" id="th-size">
-              <button type="button" id="sort-size" class="sort">大小<span class="arrow"></span></button>
-            </th>
-          </tr>
-        </thead>
-        <tbody id="rows"></tbody>
-        <tfoot>
-          <tr>
-            <th scope="row" id="total-label">总计</th>
-            <td id="total-size"></td>
-          </tr>
-        </tfoot>
-      </table>
+        <table id="result" hidden>
+          <thead>
+            <tr>
+              <th scope="col" id="th-name" aria-sort="ascending">
+                <button type="button" id="sort-name" class="sort">名称<span class="arrow"></span></button>
+              </th>
+              <th scope="col" id="th-size">
+                <button type="button" id="sort-size" class="sort">大小<span class="arrow"></span></button>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+          <tfoot>
+            <tr>
+              <th scope="row" id="total-label">总计</th>
+              <td id="total-size"></td>
+            </tr>
+          </tfoot>
+        </table>
 
-      <p class="note">
-        说明：浏览器无法枚举的文件（无权限、系统隐藏文件）与空目录不会出现在结果中，
-        因此数字可能与命令行版本略有差异。
-      </p>
+        <p class="note">
+          说明：浏览器无法枚举的文件（无权限、系统隐藏文件）与空目录不会出现在结果中，
+          因此数字可能与命令行版本略有差异。
+        </p>
+      </section>
     </main>
+
+    <!-- 拖拽悬停时的全屏遮罩 -->
+    <div id="drop-overlay" class="drop-overlay" aria-hidden="true"><span>松开鼠标，添加到列表</span></div>
   </body>
 </html>

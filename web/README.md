@@ -4,6 +4,7 @@
 
 - 纯静态、零依赖：HTML + CSS + 原生 JavaScript（ES Modules），无构建步骤。
 - 所有计算均在浏览器本地完成，不会上传任何数据。
+- 界面带大小比例条与动效（级联入场、展开补间、拖拽遮罩等），遵循 `prefers-reduced-motion` 弱化动效偏好。
 
 ## 使用
 
